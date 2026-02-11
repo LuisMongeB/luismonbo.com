@@ -1,0 +1,83 @@
+---
+// Dynamic route for individual blog posts
+// [slug].astro creates routes like /writing/ai-engineering-principles
+
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// getStaticPaths() tells Astro which pages to generate at build time
+// Required for dynamic routes in static mode
+export async function getStaticPaths() {
+  // Get all posts from the 'writing' collection
+  const posts = await getCollection('writing');
+
+  // Filter out drafts - only published posts get pages
+  const publishedPosts = posts.filter(post => !post.data.draft);
+
+  // Return array of { params, props } objects
+  // params.slug determines the URL
+  // props passes data to the component below
+  return publishedPosts.map(post => ({
+    params: { slug: post.slug }, // post.slug comes from filename
+    props: { post }, // pass the full post object as a prop
+  }));
+}
+
+// Destructure post from Astro.props
+const { post } = Astro.props;
+
+// Render the markdown content to HTML
+// This is a special Astro API for content collections
+const { Content } = await post.render();
+
+// Format date for display (e.g., "January 15, 2026")
+const formattedDate = new Intl.DateTimeFormat('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(post.data.pubDate);
+---
+
+<Layout title={`${post.data.title} · Luis Monbo`}>
+  <!-- Article container with max width for readability -->
+  <article class="prose prose-gray max-w-none">
+    <!-- Post header with title and metadata -->
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold tracking-tight mb-3">
+        {post.data.title}
+      </h1>
+
+      <!-- Metadata: date and tags -->
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {formattedDate}
+        </time>
+
+        {post.data.tags && post.data.tags.length > 0 && (
+          <div class="flex items-center gap-2">
+            {post.data.tags.map(tag => (
+              <span class="text-gray-400">#{tag}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </header>
+
+    <!-- Rendered markdown content -->
+    <!-- Astro automatically converts the .md to HTML -->
+    <!-- Tailwind's prose class styles the content beautifully -->
+    <div class="prose-lg prose-headings:font-semibold prose-headings:tracking-tight prose-a:text-gray-900 prose-a:underline hover:prose-a:text-gray-600">
+      <Content />
+    </div>
+  </article>
+
+  <!-- Back link -->
+  <div class="mt-12 pt-8 border-t border-gray-100">
+    <a
+      href="/writing"
+      class="text-sm text-gray-500 hover:text-gray-900 transition-colors"
+    >
+      ← Back to writing
+    </a>
+  </div>
+</Layout>

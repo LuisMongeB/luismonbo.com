@@ -1,0 +1,26 @@
+// Content Collections configuration
+// This file defines the schema for all content types (like blog posts)
+// Astro reads this to validate frontmatter and provide type safety
+
+import { defineCollection, z } from 'astro:content';
+
+// Define the schema for writing/blog posts
+// z is Zod - a TypeScript schema validation library (like Pydantic in Python)
+// Each field here corresponds to frontmatter in your .md files
+const writingCollection = defineCollection({
+  type: 'content', // 'content' means markdown/mdx files
+  schema: z.object({
+    title: z.string(), // Required string field
+    description: z.string(), // Short summary/excerpt
+    pubDate: z.date(), // Publication date (will be parsed from YAML date format)
+    tags: z.array(z.string()).optional(), // Optional array of tag strings
+    draft: z.boolean().default(false), // Whether post is published (default: false = published)
+  }),
+});
+
+// Export collections object
+// Key = collection name (matches folder name in src/content/)
+// Value = collection definition
+export const collections = {
+  writing: writingCollection,
+};
