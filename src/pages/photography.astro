@@ -1,20 +1,29 @@
 ---
-import Layout from '../layouts/Layout.astro'
+// Photography page — displays a carousel of photo essays
+// getCollection fetches all entries from the 'photography' content collection
+import { getCollection } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import PhotoCarousel from '../components/PhotoCarousel.astro';
+
+// Get all published photo essays, sorted by date (newest first)
+const allEssays = await getCollection('photography');
+const publishedEssays = allEssays
+  .filter(essay => !essay.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
-<Layout title="Photography · luismonbo">
-	<div class="prose prose-gray max-w-none">
-		<h1 class="text-4xl font-bold tracking-tight mb-8">Photography</h1>
+<Layout
+  title="Photography · luismonbo"
+  description="Analogue photography shot on 35mm and medium format film. Photo essays from around the world."
+>
+  <!-- Title and intro stay within the narrow column (inherited from Layout) -->
+  <h1 class="text-5xl font-bold tracking-tight mb-6">Photography</h1>
 
-		<p class="text-lg text-gray-700 leading-relaxed mb-12">
-			Analogue photography shot on 35mm and medium format film.
-			Mostly street photography, portraits, and whatever catches my eye.
-		</p>
+  <p class="text-xl text-gray-700 leading-relaxed mb-12">
+    Analogue photography shot on 35mm and medium format film.
+    Mostly street photography, portraits, and whatever catches my eye.
+  </p>
 
-		<!-- Placeholder for future gallery -->
-		<div class="border border-gray-200 rounded-lg p-8 text-center text-gray-500">
-			<p>Photo gallery coming soon.</p>
-			<p class="text-sm mt-2">Currently scanning negatives and building the gallery component.</p>
-		</div>
-	</div>
+  <!-- Carousel breaks out to full width via its own CSS -->
+  <PhotoCarousel essays={publishedEssays} />
 </Layout>
