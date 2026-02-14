@@ -34,10 +34,28 @@ const photographyCollection = defineCollection({
   }),
 });
 
+// Define the schema for project pages
+// Each project is a markdown narrative about a GitHub repo
+const projectsCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),              // One-liner for listing card
+    accentColor: z.string(),              // Hex color for card border and detail accents
+    repoUrl: z.string(),                  // GitHub repo link
+    liveUrl: z.string().optional(),       // Optional deployed site/demo link
+    techStack: z.array(z.string()),       // Technologies displayed as tags
+    status: z.string(),                   // "In Progress", "Complete", or "Archived"
+    pubDate: z.date(),
+    draft: z.boolean().default(false),
+  }),
+});
+
 // Export collections object
 // Key = collection name (matches folder name in src/content/)
 // Value = collection definition
 export const collections = {
   writing: writingCollection,
   photography: photographyCollection,
+  projects: projectsCollection,
 };

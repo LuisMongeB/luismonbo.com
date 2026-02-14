@@ -1,0 +1,38 @@
+---
+// Projects listing page — displays project cards in a 2-column grid
+// getCollection fetches all entries from the 'projects' content collection
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+
+// Get all published projects, sorted by date (newest first)
+const allProjects = await getCollection('projects');
+const publishedProjects = allProjects
+  .filter(project => !project.data.draft)
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+<Layout
+  title="Projects · luismonbo"
+  description="Open-source projects in Rust, Python, and AI engineering. Behind-the-scenes design decisions and technical narratives."
+>
+  <h1 class="text-5xl font-bold tracking-tight mb-6">Projects</h1>
+
+  <p class="text-xl text-gray-700 leading-relaxed mb-12">
+    Open-source tools and experiments. Each project page tells the story behind the code — design decisions, trade-offs, and what I learned building it.
+  </p>
+
+  <!-- 2-column grid on desktop, single column on mobile -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {publishedProjects.map((project) => (
+      <ProjectCard
+        slug={project.slug}
+        title={project.data.title}
+        description={project.data.description}
+        accentColor={project.data.accentColor}
+        techStack={project.data.techStack}
+        status={project.data.status}
+      />
+    ))}
+  </div>
+</Layout>

@@ -1,0 +1,106 @@
+---
+// Dynamic route for individual project pages
+// [slug].astro creates routes like /projects/ai-gateway
+import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+// getStaticPaths() tells Astro which pages to generate at build time
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  const publishedProjects = projects.filter(project => !project.data.draft);
+
+  return publishedProjects.map(project => ({
+    params: { slug: project.slug },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await project.render();
+---
+
+<Layout
+  title={`${project.data.title} · luismonbo`}
+  description={project.data.description}
+>
+  <article class="max-w-none">
+    <!-- Title with accent color left border -->
+    <header class="mb-8">
+      <h1
+        class="text-5xl font-bold tracking-tight leading-tight pl-5 mb-4"
+        style={`border-left: 4px solid ${project.data.accentColor};`}
+      >
+        {project.data.title}
+      </h1>
+
+      <p class="text-xl text-gray-500 leading-relaxed mb-6">
+        {project.data.description}
+      </p>
+
+      <!-- Tech stack tags + status -->
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        {project.data.techStack.map((tech) => (
+          <span class="text-sm px-2.5 py-0.5 bg-gray-100 text-gray-600 rounded">
+            {tech}
+          </span>
+        ))}
+        <span class="text-sm text-gray-400">{project.data.status}</span>
+      </div>
+
+      <!-- Repo and live links -->
+      <div class="flex items-center gap-4 text-sm">
+        <a
+          href={project.data.repoUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hover:underline transition-colors"
+          style={`color: ${project.data.accentColor};`}
+        >
+          GitHub Repository &rarr;
+        </a>
+        {project.data.liveUrl && (
+          <a
+            href={project.data.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="hover:underline transition-colors"
+            style={`color: ${project.data.accentColor};`}
+          >
+            Live Demo &rarr;
+          </a>
+        )}
+      </div>
+    </header>
+
+    <!-- Divider before essay body -->
+    <hr class="border-gray-100 mb-12" />
+
+    <!-- Essay body — prose styling with breakout images -->
+    <div class="prose prose-lg prose-gray max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-a:text-gray-900 prose-a:underline hover:prose-a:text-gray-600 prose-strong:text-gray-900 project-prose">
+      <Content />
+    </div>
+  </article>
+
+  <!-- Back link -->
+  <div class="mt-16 pt-8 border-t border-gray-100">
+    <a
+      href="/projects"
+      class="text-base text-gray-500 hover:text-gray-900 transition-colors"
+    >
+      &larr; Back to projects
+    </a>
+  </div>
+</Layout>
+
+<!-- Style for breakout images within prose -->
+<!-- Same technique as photography essay pages -->
+<style>
+  .project-prose :global(img) {
+    max-width: 64rem;
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+</style>

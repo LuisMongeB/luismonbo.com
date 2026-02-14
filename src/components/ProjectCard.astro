@@ -1,0 +1,37 @@
+---
+// ProjectCard.astro — card component for the projects listing grid
+// Displays project title, tech stack tags, description, and status
+// Left border uses the project's accent color via inline style
+
+interface Props {
+  slug: string;
+  title: string;
+  description: string;
+  accentColor: string;
+  techStack: string[];
+  status: string;
+}
+
+const { slug, title, description, accentColor, techStack, status } = Astro.props;
+---
+
+<a
+  href={`/projects/${slug}`}
+  class="block p-6 border border-gray-100 rounded-lg hover:shadow-md transition-shadow duration-200"
+  style={`border-left: 4px solid ${accentColor};`}
+>
+  <h3 class="text-xl font-semibold text-gray-900 mb-2">{title}</h3>
+
+  <!-- Tech stack tags -->
+  <div class="flex flex-wrap gap-2 mb-3">
+    {techStack.map((tech) => (
+      <span class="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded">
+        {tech}
+      </span>
+    ))}
+  </div>
+
+  <p class="text-base text-gray-600 leading-relaxed mb-3">{description}</p>
+
+  <span class="text-sm text-gray-400">{status}</span>
+</a>
