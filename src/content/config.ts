@@ -18,9 +18,26 @@ const writingCollection = defineCollection({
   }),
 });
 
+// Define the schema for photo essays
+// Similar to writing but with photography-specific metadata
+const photographyCollection = defineCollection({
+  type: 'content',
+  schema: z.object({
+    title: z.string(),
+    caption: z.string(),                    // Short text shown on carousel hover
+    pubDate: z.date(),
+    coverImage: z.string(),                 // Path to cover image in public/photos/
+    location: z.string().optional(),        // Where the photos were taken
+    camera: z.string().optional(),          // Camera body used
+    film: z.string().optional(),            // Film stock used
+    draft: z.boolean().default(false),
+  }),
+});
+
 // Export collections object
 // Key = collection name (matches folder name in src/content/)
 // Value = collection definition
 export const collections = {
   writing: writingCollection,
+  photography: photographyCollection,
 };
